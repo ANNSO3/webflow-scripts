@@ -1,21 +1,16 @@
 document.addEventListener("click", function (event) {
-  // Find clicked element or nearest ancestor with data-dropdown
+  // detect clicked element or nearest ancestor with data-dropdown
   let dropdownElement = event.target.hasAttribute("data-dropdown")
     ? event.target
     : event.target.closest("[data-dropdown]");
 
   if (!dropdownElement) return;
 
-  // Get the data-dropdown value
   const dropdownValue = dropdownElement.getAttribute("data-dropdown");
-
-  // Match tab element
   const tabElement = document.querySelector(`[data-w-tab="${dropdownValue}"]`);
-
-  // The specific dropdown component (your class)
   const dropdownContainer = dropdownElement.closest(".dropdown-2");
 
-  // Update text
+  // update label inside the same dropdown
   const dropdownText = dropdownElement.textContent.trim();
   const replaceTextElement = dropdownContainer
     ? dropdownContainer.querySelector(".replace-text")
@@ -24,11 +19,34 @@ document.addEventListener("click", function (event) {
   if (tabElement) tabElement.click();
   if (replaceTextElement) replaceTextElement.textContent = dropdownText;
 
-setTimeout(function () {
-  const dropdownInstance = dropdownElement.closest(".dropdown-2");
-  if (dropdownInstance) {
-    $(dropdownInstance).triggerHandler("w-close.w-dropdown");
-  }
-}, 10);
-});
+  // close only THIS dropdown instance
+  setTimeout(function () {
+    if (!dropdownContainer) return;
 
+    // 1) Prefer clicking the toggle button (this mimics native Webflow behavior)
+    const toggle = dropdownContainer.querySelector(".w-dropdown-toggle");
+    if (toggle) {
+      toggle.click();
+      return;
+    }
+
+    // 2) Fallback: try to trigger the Webflow close event on the dropdown container
+    try {
+      $(dropdownContainer).triggerHandler("w-close.w-dropdown");
+      return;
+    } catch (e) {
+      // continue to next fallback
+    }
+
+    // 3) Additional fallback: remove Webflow 'open' class from the container
+    // This is a last-resort method and may skip animation, but closes the list.
+    dropdownContainer.classList.remove("w--open");
+    // Also try closing any child list variants
+    const list =
+      dropdownContainer.querySelector(".w-dropdown-list") ||
+      dropdownContainer.querySelector(".dropdown-list") ||
+      dropdownContainer.querySelector(".Dropdown.List") ||
+      dropdownContainer.querySelector(".DropdownList");
+    if (list) list.style.display = "none";
+  }, 10);
+});
