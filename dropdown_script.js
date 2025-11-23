@@ -1,37 +1,37 @@
-// jQuery-only handler that mirrors the original snippet but scoped to the clicked dropdown instance
-$("[data-dropdown]").on("click", function (e) {
-  e.preventDefault(); // prevent default link behavior if these are anchors
+document.addEventListener("click", function (event) {
+  // Check if clicked element or its parent has the data-dropdown attribute
+  let dropdownElement = event.target.hasAttribute("data-dropdown")
+    ? event.target
+    : event.target.closest("[data-dropdown]");
 
-  var $link = $(this); // clicked dropdown link
-  var dropdownValue = $link.attr("data-dropdown"); // the tab name
-  var $tab = $('[data-w-tab="' + dropdownValue + '"]'); // matching tab
-  var $dropdownInstance = $link.closest(".dropdown-2"); // your required wrapper
+  if (dropdownElement) {
+    // Get the value of the data-dropdown attribute
+    const dropdownValue = dropdownElement.getAttribute("data-dropdown");
 
-  // Update tab (if found)
-  if ($tab.length) {
-    $tab.get(0).click();
-  }
+    // Find the matching tab element using the data-w-tab attribute
+    const tabElement = document.querySelector(
+      `[data-w-tab="${dropdownValue}"]`
+    );
 
-  // Update the replace-text inside the same dropdown
-  var newText = $link.text().trim();
-  if ($dropdownInstance.length) {
-    var $replace = $dropdownInstance.find(".replace-text");
-    if ($replace.length) $replace.text(newText);
-  }
-
-  // Close only THIS dropdown instance (preferred: trigger Webflow close handler on instance)
-  if ($dropdownInstance.length) {
-    $dropdownInstance.triggerHandler("w-close.w-dropdown");
-  } else {
-    // fallback to original global close if instance not found
-    $(".dropdown").triggerHandler("w-close.w-dropdown");
-  }
-
-  // Extra fallback: if still open, click the toggle to force-close (mimics native behavior)
-  setTimeout(function () {
-    if ($dropdownInstance.length && $dropdownInstance.hasClass("w--open")) {
-      var $toggle = $dropdownInstance.find(".w-dropdown-toggle");
-      if ($toggle.length) $toggle.get(0).click();
+    // If a matching tab is found, trigger a click on it
+    if (tabElement) {
+      tabElement.click();
     }
-  }, 10);
+
+    // Extract text directly from the dropdown element
+    const dropdownText = dropdownElement.textContent.trim();
+
+    // Find the element with .replace-text class
+    const replaceTextElement = document.querySelector(".replace-text");
+
+    // If found, replace its text content with the text extracted from data-dropdown element
+    if (replaceTextElement) {
+      replaceTextElement.textContent = dropdownText;
+    }
+  }
+});
+
+$("[data-dropdown]").click(function () {
+  //$(".dropdown").css("z-index", "");
+  $(".dropdown").triggerHandler("w-close.w-dropdown");
 });
