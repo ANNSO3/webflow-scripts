@@ -32,9 +32,9 @@ document.addEventListener("click", function (event) {
   if (replaceTextElement) {
     replaceTextElement.textContent = dropdownText;
   }
+});
 
-  // Close dropdown AFTER the tab click + text update (important)
-  setTimeout(function () {
-    $(".dropdown").triggerHandler("w-close.w-dropdown");
-  }, 40);
+$("[data-dropdown]").click(function () {
+  //$(".dropdown").css("z-index", "");
+  $(".dropdown").triggerHandler("w-close.w-dropdown");
 });
