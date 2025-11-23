@@ -1,40 +1,37 @@
-document.addEventListener("click", function (event) {
-  // Find clicked element or nearest ancestor with data-dropdown
-  let dropdownElement = event.target.hasAttribute("data-dropdown")
-    ? event.target
-    : event.target.closest("[data-dropdown]");
+// jQuery-only handler that mirrors the original snippet but scoped to the clicked dropdown instance
+$("[data-dropdown]").on("click", function (e) {
+  e.preventDefault(); // prevent default link behavior if these are anchors
 
-  if (!dropdownElement) return;
+  var $link = $(this); // clicked dropdown link
+  var dropdownValue = $link.attr("data-dropdown"); // the tab name
+  var $tab = $('[data-w-tab="' + dropdownValue + '"]'); // matching tab
+  var $dropdownInstance = $link.closest(".dropdown-2"); // your required wrapper
 
-  // Get the data-dropdown value
-  const dropdownValue = dropdownElement.getAttribute("data-dropdown");
-
-  // Find the matching tab element using the data-w-tab attribute
-  const tabElement = document.querySelector(`[data-w-tab="${dropdownValue}"]`);
-
-  // Find the dropdown container (your required class)
-  const dropdownContainer = dropdownElement.closest(".dropdown-2");
-
-  // Extract text from the clicked dropdown link
-  const dropdownText = dropdownElement.textContent.trim();
-
-  // Find the replace-text element inside this same dropdown component
-  const replaceTextElement = dropdownContainer
-    ? dropdownContainer.querySelector(".replace-text")
-    : null;
-
-  // Trigger the tab click
-  if (tabElement) {
-    tabElement.click();
+  // Update tab (if found)
+  if ($tab.length) {
+    $tab.get(0).click();
   }
 
-  // Update the local replace-text
-  if (replaceTextElement) {
-    replaceTextElement.textContent = dropdownText;
+  // Update the replace-text inside the same dropdown
+  var newText = $link.text().trim();
+  if ($dropdownInstance.length) {
+    var $replace = $dropdownInstance.find(".replace-text");
+    if ($replace.length) $replace.text(newText);
   }
-});
 
-$("[data-dropdown]").click(function () {
-  //$(".dropdown").css("z-index", "");
-  $(".dropdown").triggerHandler("w-close.w-dropdown");
+  // Close only THIS dropdown instance (preferred: trigger Webflow close handler on instance)
+  if ($dropdownInstance.length) {
+    $dropdownInstance.triggerHandler("w-close.w-dropdown");
+  } else {
+    // fallback to original global close if instance not found
+    $(".dropdown").triggerHandler("w-close.w-dropdown");
+  }
+
+  // Extra fallback: if still open, click the toggle to force-close (mimics native behavior)
+  setTimeout(function () {
+    if ($dropdownInstance.length && $dropdownInstance.hasClass("w--open")) {
+      var $toggle = $dropdownInstance.find(".w-dropdown-toggle");
+      if ($toggle.length) $toggle.get(0).click();
+    }
+  }, 10);
 });
