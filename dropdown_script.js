@@ -9,32 +9,25 @@ document.addEventListener("click", function (event) {
   // Get the data-dropdown value
   const dropdownValue = dropdownElement.getAttribute("data-dropdown");
 
-  // Find the matching tab element using the data-w-tab attribute
+  // Match tab element
   const tabElement = document.querySelector(`[data-w-tab="${dropdownValue}"]`);
 
-  // Find the dropdown container (your required class)
+  // The specific dropdown component (your class)
   const dropdownContainer = dropdownElement.closest(".dropdown-2");
 
-  // Extract text from the clicked dropdown link
+  // Update text
   const dropdownText = dropdownElement.textContent.trim();
-
-  // Find the replace-text element inside this same dropdown component
   const replaceTextElement = dropdownContainer
     ? dropdownContainer.querySelector(".replace-text")
     : null;
 
-  // Trigger the tab click
-  if (tabElement) {
-    tabElement.click();
-  }
+  if (tabElement) tabElement.click();
+  if (replaceTextElement) replaceTextElement.textContent = dropdownText;
 
-  // Update the local replace-text
-  if (replaceTextElement) {
-    replaceTextElement.textContent = dropdownText;
-  }
-
-  // Close dropdown AFTER the tab click + text update (important)
+  // Close only this dropdown
   setTimeout(function () {
-    $(".dropdown").triggerHandler("w-close.w-dropdown");
-  }, 40);
+    if (dropdownContainer) {
+      $(dropdownContainer).triggerHandler("w-close.w-dropdown");
+    }
+  }, 10);
 });
