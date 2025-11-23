@@ -24,10 +24,11 @@ document.addEventListener("click", function (event) {
   if (tabElement) tabElement.click();
   if (replaceTextElement) replaceTextElement.textContent = dropdownText;
 
-  // Close only this dropdown
-  setTimeout(function () {
-    if (dropdownContainer) {
-      $(dropdownContainer).triggerHandler("w-close.w-dropdown");
-    }
-  }, 10);
+setTimeout(function () {
+  const dropdownInstance = dropdownElement.closest(".dropdown-2");
+  if (dropdownInstance) {
+    $(dropdownInstance).triggerHandler("w-close.w-dropdown");
+  }
+}, 10);
 });
+
